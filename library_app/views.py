@@ -1,12 +1,14 @@
 from library_app.models import (
   Course,
-  Book)
+  Book,
+  Branch)
 from rest_framework.generics import (
   ListAPIView,
   CreateAPIView)
 from library_app.serializers import (
   CourseSerializer, 
-  BookSerializer) 
+  BookSerializer,
+  BranchSerializer) 
 from rest_framework import status
 from rest_framework.response import Response
 
@@ -27,6 +29,14 @@ class BookCreateView(CreateAPIView):
   queryset = Book.objects.all()
   serializer_class = BookSerializer
 
+class BranchListView(ListAPIView):
+  queryset = Branch.objects.all()
+  serializer_class = BranchSerializer
+
+class BranchCreateView(CreateAPIView):
+  queryset = Branch.objects.all()
+  serializer_class = BranchSerializer
+  
 # class BookView(APIView):
 #   serializer_class = BookSerializer
 

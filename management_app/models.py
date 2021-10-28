@@ -5,7 +5,7 @@ class Application(models.Model):
   name = models.CharField(max_length=150)
   dob = models.CharField(max_length=15)
   email = models.EmailField(max_length=55)
-  enrol_num = models.CharField(max_length=55, unique=True)
+  enrol_num = models.CharField(max_length=55)
   course_name = models.CharField(max_length=150)
   branch_name = models.CharField(max_length=150)
   session_year = models.CharField(max_length=20)
