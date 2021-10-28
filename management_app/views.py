@@ -40,5 +40,20 @@ class ApplicationList(generics.ListAPIView):
 
 
 class ApproveApplication(APIView):
-  # serializer_class = ApplicationSerializer
-  pass
+  serializer_class = ApplicationSerializer
+  def post(self, request, format=None):
+    application_id = request.data['id']
+    queryset = Application.objects.filter(id=application_id)
+    serializer = self.serializer_class(data=queryset)
+    if queryset.exists() and serializer.is_valid():
+      name = queryset.name
+      dob = queryset.dob
+      email = queryset.email
+      enrol_num = queryset.enrol_num
+      course_name = queryset.course_name
+      branch_name = queryset.branch_name
+      session_year = queryset.session_year
+
+
+    return response.Response({"error":"Data doesn't exist."}, status=status.HTTP_400_BAD_REQUEST)
+    
