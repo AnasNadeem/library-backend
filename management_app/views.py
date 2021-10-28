@@ -38,22 +38,22 @@ class ApplicationList(generics.ListAPIView):
   queryset = Application.objects.all()
   serializer_class = ApplicationSerializer
 
+class UnapprovedApplicationList(APIView):
+  serializer_class = ApplicationSerializer
+  def get(self, request, format=None):
+    queryset = Application.objects.filter(is_approved=False)
+    serializer = self.serializer_class(data=queryset, many=True)
+    return response.Response({'data':serializer.data}, status=status.HTTP_200_OK)
 
 class ApproveApplication(APIView):
   serializer_class = ApplicationSerializer
   def post(self, request, format=None):
     application_id = request.data['id']
-    queryset = Application.objects.filter(id=application_id)
-    serializer = self.serializer_class(data=queryset)
-    if queryset.exists() and serializer.is_valid():
-      name = queryset.name
-      dob = queryset.dob
-      email = queryset.email
-      enrol_num = queryset.enrol_num
-      course_name = queryset.course_name
-      branch_name = queryset.branch_name
-      session_year = queryset.session_year
-
-
+    apllication = Application.objects.filter(id=application_id)
+    serializer = self.serializer_class(data=apllication)
+    if apllication.exists() and serializer.is_valid():
+      apllication.is_approved = True
+      apllication.save()
+      return response.Response({"success":"Application approved."}, status=status.HTTP_201_CREATED)
     return response.Response({"error":"Data doesn't exist."}, status=status.HTTP_400_BAD_REQUEST)
     
