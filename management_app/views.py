@@ -2,8 +2,10 @@ from management_app.models import Application
 from management_app.serializers import ApplicationSerializer
 from rest_framework.views import APIView
 from rest_framework import status, response, generics
+from django.contrib.auth.models import User
 
 class ApplicationSubmit(APIView):
+  '''Submitting the application of the student for their Library card with their details.'''
   serializer_class = ApplicationSerializer
   def post(self, request, format=None):
     serializer = self.serializer_class(data=request.data)
@@ -35,25 +37,43 @@ class ApplicationSubmit(APIView):
     return response.Response({'error': "Invalid Data."}, status=status.HTTP_400_BAD_REQUEST)
 
 class ApplicationList(generics.ListAPIView):
+  '''All the application list.'''
   queryset = Application.objects.all()
   serializer_class = ApplicationSerializer
 
 class UnapprovedApplicationList(APIView):
+  '''Pending application list of student to be verified and approved by the teacher.'''
   serializer_class = ApplicationSerializer
   def get(self, request, format=None):
     queryset = Application.objects.filter(is_approved=False)
     serializer = self.serializer_class(data=queryset, many=True)
+    serializer.is_valid()
+    return response.Response({"data":serializer.data}, status=status.HTTP_200_OK)
+
+class ApprovedApplicationList(APIView):
+  '''Pending application list of student to be verified and approved by the teacher.'''
+  serializer_class = ApplicationSerializer
+  def get(self, request, format=None):
+    queryset = Application.objects.filter(is_approved=True)
+    serializer = self.serializer_class(data=queryset, many=True)
+    serializer.is_valid()
     return response.Response({'data':serializer.data}, status=status.HTTP_200_OK)
 
 class ApproveApplication(APIView):
-  serializer_class = ApplicationSerializer
+  '''Approving application of student after verifying their crendentials by the teacher.'''
   def post(self, request, format=None):
     application_id = request.data['id']
-    apllication = Application.objects.filter(id=application_id)
-    serializer = self.serializer_class(data=apllication)
-    if apllication.exists() and serializer.is_valid():
-      apllication.is_approved = True
-      apllication.save()
+    application = Application.objects.filter(id=application_id)
+    if application.exists():
+      application = application[0]
+      application.is_approved = True
+      application.save()
+      # Creating user of student application with enrollment number as username and password as First name and dob year.
+      enrol_num = application.enrol_num
+      name = application.name
+      dob = application.dob
+      password = name.split(' ')[0] + dob.split('-')[2]
+      User.objects.create(username=enrol_num, password=password)
       return response.Response({"success":"Application approved."}, status=status.HTTP_201_CREATED)
     return response.Response({"error":"Data doesn't exist."}, status=status.HTTP_400_BAD_REQUEST)
     
