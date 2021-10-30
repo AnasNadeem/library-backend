@@ -25,6 +25,7 @@ class BookSession(models.Model):
   book = models.ForeignKey(Book, on_delete=models.CASCADE)
   student = models.ForeignKey(Application, on_delete=models.CASCADE)
   book_status = models.CharField(max_length=55, choices=BOOK_STATUS)
-  issued_at = models.DateField(auto_now_add=True)
+  issued_at = models.DateField(null=True, blank=True)
   returned_at = models.DateField(null=True, blank=True)
 
+  
