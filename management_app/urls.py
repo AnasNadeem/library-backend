@@ -8,7 +8,10 @@ from management_app.views import (
   ApprovedApplicationList,
   BookApplicationList,
   UserAskForBook,
-  UserBookList)
+  UserBookList,
+  IssuePendingBook,
+  ReturnBook
+  )
 
 urlpatterns = [
   path('application/' , ApplicationSubmit.as_view()),
@@ -19,5 +22,7 @@ urlpatterns = [
   path('dismiss-application/', DismissApplication.as_view()),
   path('all-book-user-list/', BookApplicationList.as_view()),
   path('book-application/', UserAskForBook.as_view()),
-  path('book-user-list/', UserBookList.as_view())
+  path('book-user-list/', UserBookList.as_view()),
+  path('issue-pend-book/', IssuePendingBook.as_view()),
+  path('return-book/', ReturnBook.as_view()),
 ]

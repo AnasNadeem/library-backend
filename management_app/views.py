@@ -136,3 +136,44 @@ class UserBookList(APIView):
     # 2. If, then check the issued date and if the crnt date longs to 30days then change the book_status to due
     # Else show the data.
     return response.Response(serializer.data, status=status.HTTP_200_OK)
+
+class IssuePendingBook(APIView):
+  ''' Admin issue the pending book.'''
+  permission_classes = [IsAdminUser]
+  serializer_class = BookSerializer
+  def post(self, request, format=None):
+    serializer = self.serializer_class(data=request.data)
+    if serializer.is_valid():
+      book_id = request.data['book']
+      student_app_id = request.data['student']
+      book_session = BookSession.ojbects.filter(book=book_id,student=student_app_id)
+      if book_session.exists():
+        book_session = book_session[0]
+        book_session.book_status = 'issued'
+        book_session.save()
+        return response.Response({"success":"Book has been issued."}, status=status.HTTP_201_CREATED)
+      return response.Response({"error":"No data exists."}, status=status.HTTP_400_BAD_REQUEST)
+    return response.Response({"error":"Data not valid."}, status=status.HTTP_400_BAD_REQUEST)
+
+class ReturnBook(APIView):
+  ''' Admin accept the book and update book_session to returned.'''
+  permission_classes = [IsAdminUser]
+  serializer_class = BookSerializer
+  def post(self, request, format=None):
+    serializer = self.serializer_class(data=request.data)
+    if serializer.is_valid():
+      book_id = request.data['book']
+      student_app_id = request.data['student']
+      book_session = BookSession.ojbects.filter(book=book_id,student=student_app_id)
+      if book_session.exists():
+        book_session = book_session[0]
+        book_session.book_status = 'returned'
+        book_session.save()
+        return response.Response({"success":"Book has been returned."}, status=status.HTTP_201_CREATED)
+      return response.Response({"error":"No data exists."}, status=status.HTTP_400_BAD_REQUEST)
+    return response.Response({"error":"Data not valid."}, status=status.HTTP_400_BAD_REQUEST)
+
+class IssueNewBook(APIView):
+  permission_classes = [IsAdminUser]
+  def post(self, request, format=None):
+    pass
