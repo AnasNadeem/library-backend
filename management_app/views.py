@@ -83,7 +83,6 @@ class ApproveApplication(APIView):
       return response.Response({"success":"Application approved."}, status=status.HTTP_201_CREATED)
     return response.Response({"error":"Data doesn't exist."}, status=status.HTTP_400_BAD_REQUEST)
     
-
 class DismissApplication(APIView):
   '''Dismissing application of student after verifying their crendentials by the teacher.'''
   permission_classes = [IsAdminUser]
@@ -177,3 +176,4 @@ class IssueNewBook(APIView):
   permission_classes = [IsAdminUser]
   def post(self, request, format=None):
     pass
+
