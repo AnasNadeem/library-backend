@@ -4,7 +4,7 @@ from rest_framework.views import APIView
 from rest_framework import status, response, generics
 from django.contrib.auth.models import User
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
-
+from datetime import date
 class ApplicationSubmit(APIView):
   '''Submitting the application of the student for their Library card with their details.'''
   serializer_class = ApplicationSerializer
@@ -132,7 +132,13 @@ class UserBookList(APIView):
     serializer = self.serializer_class(data=book_session_list, many=True)
     serializer.is_valid()
     # 1. Check if the book is issued 
+    issued_book_list = book_session_list.filter(book_status='issued')
     # 2. If, then check the issued date and if the crnt date longs to 30days then change the book_status to due
+    if issued_book_list.exists():
+      for book in issued_book_list:
+        if (date.today() - book.issued_at) >30:
+          book.book_status = 'due'
+          book.save()
     # Else show the data.
     return response.Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -175,5 +181,24 @@ class ReturnBook(APIView):
 class IssueNewBook(APIView):
   permission_classes = [IsAdminUser]
   def post(self, request, format=None):
-    pass
+    student_id = request.data.get('student_id')
+    book_id = request.data.get('book_id')
+    book_status = 'issued'
+    # Check if book has already been issued or pending 
+    book_application = BookSession.objects.filter(student=student_id, book=book_id)
+    if book_application.exists():
+      crnt_status = book_application.book_status
+      return response.Response({"data":f"Book is already in {crnt_status} mode."}, status=status.HTTP_200_OK)
+
+    try:
+      book = BookSession()
+      book.book = book_id
+      book.student = student_id
+      book.book_status = book_status
+      book.issued_at = date.today()
+      book.save()
+
+      return response.Response({'success':"Book has been issued."}, status=status.HTTP_201_CREATED)
+    except Exception as e:
+      return response.Response({'error':f"{e}"}, status=status.HTTP_400_BAD_REQUEST)
 

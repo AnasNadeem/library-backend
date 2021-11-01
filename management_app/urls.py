@@ -10,8 +10,9 @@ from management_app.views import (
   UserAskForBook,
   UserBookList,
   IssuePendingBook,
-  ReturnBook
-  )
+  ReturnBook,
+  IssueNewBook
+)
 
 urlpatterns = [
   path('application/' , ApplicationSubmit.as_view()),
@@ -25,4 +26,5 @@ urlpatterns = [
   path('book-user-list/', UserBookList.as_view()),
   path('issue-pend-book/', IssuePendingBook.as_view()),
   path('return-book/', ReturnBook.as_view()),
+  path('issue-new-book/', IssueNewBook.as_view()),
 ]
